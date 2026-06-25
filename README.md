@@ -1,2 +1,2 @@
-# XLifeOS-Website
+# XLifeOS
 about website
