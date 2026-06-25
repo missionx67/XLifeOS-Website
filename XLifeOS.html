@@ -1,0 +1,726 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>XLifeOS · 身体、心智与人生的管理系统</title>
+<meta name="description" content="为认真对待人生的人，提供身心与生命的管理工具。">
+<style>
+  :root {
+    --bg:          #F8F7F4;
+    --bg-dark:     #1E1C18;
+    --surface:     #FFFFFF;
+    --surface-2:   #F2EEE8;
+    --surface-3:   #EAE5D8;
+    --border:      #E2DBD0;
+    --text:        #1E1C18;
+    --text-soft:   #56514A;
+    --text-mute:   #98918A;
+    --accent:      #6B7F5B;
+    --accent-h:    #58694A;
+    --accent-soft: #E3E8DA;
+    --accent-pale: #F0F3EC;
+    --gold:        #A07840;
+    --gold-soft:   #F2E8D4;
+    --warm:        #7A6B5B;
+    --radius:      14px;
+    --radius-lg:   20px;
+    --shadow:      0 1px 3px rgba(30,28,24,.06), 0 6px 24px rgba(30,28,24,.08);
+    --shadow-sm:   0 1px 3px rgba(30,28,24,.06);
+    --font:        -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei",
+                   "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+    --font-serif:  "Songti SC", "STSong", "SimSun", Georgia, serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 15px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  button { font-family: inherit; cursor: pointer; }
+  img { display: block; max-width: 100%; }
+
+  /* ────────── LAYOUT ────────── */
+  .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .section { padding: 80px 0; }
+  .section-sm { padding: 56px 0; }
+
+  /* ────────── NAV ────────── */
+  .nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(248,247,244,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    display: flex; align-items: center;
+    justify-content: space-between; height: 60px;
+  }
+  .nav-logo { display: flex; align-items: center; gap: 10px; }
+  .nav-logo-icon {
+    width: 32px; height: 32px;
+    background: var(--accent); border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 17px;
+  }
+  .nav-logo-text {
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 0.02em; color: var(--text);
+  }
+  .nav-links {
+    display: flex; align-items: center; gap: 28px; list-style: none;
+  }
+  .nav-links a { font-size: 14px; color: var(--text-soft); transition: color .2s; }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-cta {
+    background: var(--accent); color: white !important;
+    padding: 7px 18px; border-radius: 20px;
+    font-weight: 500; font-size: 13px !important;
+    transition: background .2s !important;
+  }
+  .nav-cta:hover { background: var(--accent-h) !important; }
+
+  /* ────────── HERO ────────── */
+  .hero { padding: 96px 0 80px; text-align: center; }
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: var(--accent-soft); color: var(--accent);
+    border: 1px solid #C0D4E4; border-radius: 20px;
+    padding: 5px 16px; font-size: 12px; font-weight: 500;
+    margin-bottom: 24px; letter-spacing: 0.04em;
+  }
+  .hero h1 {
+    font-size: clamp(28px, 5vw, 48px); font-weight: 700;
+    line-height: 1.22; letter-spacing: -0.02em;
+    margin-bottom: 18px; color: var(--text);
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero-sub {
+    font-size: clamp(15px, 2vw, 18px); color: var(--text-soft);
+    max-width: 600px; margin: 0 auto 36px; line-height: 1.8;
+  }
+  .hero-actions {
+    display: flex; gap: 12px; justify-content: center;
+    flex-wrap: wrap; margin-bottom: 60px;
+  }
+  .btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    padding: 12px 26px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; border: none;
+    cursor: pointer; transition: all .2s; font-family: inherit;
+  }
+  .btn-primary { background: var(--accent); color: white; }
+  .btn-primary:hover { background: var(--accent-h); transform: translateY(-1px); }
+  .btn-outline { background: none; border: 1px solid var(--border); color: var(--text-soft); }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hero-stats {
+    display: flex; justify-content: center; gap: 48px;
+    padding: 28px 32px;
+    background: var(--surface); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    max-width: 620px; margin: 0 auto;
+  }
+  .stat-item { text-align: center; }
+  .stat-num {
+    font-size: 26px; font-weight: 700; color: var(--accent);
+    line-height: 1; margin-bottom: 4px; font-family: var(--font-serif);
+  }
+  .stat-label { font-size: 12px; color: var(--text-mute); }
+
+  /* ────────── SECTION HEADER ────────── */
+  .section-tag {
+    display: inline-block;
+    background: var(--accent-soft); color: var(--accent);
+    border-radius: 20px; padding: 4px 14px;
+    font-size: 12px; font-weight: 600;
+    letter-spacing: 0.06em; margin-bottom: 14px;
+  }
+  .section-title {
+    font-size: clamp(22px, 3.5vw, 32px); font-weight: 700;
+    line-height: 1.3; margin-bottom: 12px;
+  }
+  .section-desc {
+    font-size: 15px; color: var(--text-soft);
+    max-width: 520px; line-height: 1.75;
+  }
+
+  /* ────────── TOOLS ────────── */
+  .tools-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 20px; margin-top: 48px;
+  }
+  .tool-card {
+    background: var(--surface); border-radius: var(--radius-lg);
+    box-shadow: var(--shadow); border: 1px solid var(--border);
+    overflow: hidden; display: flex; flex-direction: column;
+    transition: transform .25s, box-shadow .25s;
+  }
+  .tool-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px rgba(30,28,24,.08), 0 16px 40px rgba(30,28,24,.12);
+  }
+  .tool-card-top { padding: 32px 32px 24px; flex: 1; }
+  .tool-tag {
+    display: inline-block; font-size: 11px; font-weight: 600;
+    padding: 3px 10px; border-radius: 20px;
+    margin-bottom: 16px; letter-spacing: 0.04em;
+  }
+  .tag-blue   { background: var(--accent-soft); color: var(--accent); }
+  .tag-gold   { background: var(--gold-soft); color: var(--gold); }
+  .tag-warm   { background: #EDE8DF; color: var(--warm); }
+  .tag-slate  { background: #E3E8EF; color: #4A5A6A; }
+
+  .tool-icon { font-size: 40px; margin-bottom: 16px; display: block; }
+  .tool-name {
+    font-size: 22px; font-weight: 700; margin-bottom: 10px;
+    font-family: var(--font-serif); letter-spacing: 0.05em;
+  }
+  .tool-desc {
+    font-size: 14px; color: var(--text-soft);
+    line-height: 1.7; margin-bottom: 20px;
+  }
+  .tool-features { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 8px; }
+  .feat-chip {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 3px 10px;
+    font-size: 12px; color: var(--text-soft);
+  }
+  .tool-card-bottom {
+    padding: 20px 32px; border-top: 1px solid var(--border);
+    background: var(--surface-2); display: flex;
+    align-items: center; justify-content: space-between;
+  }
+  .tool-status {
+    font-size: 12px; color: var(--accent); font-weight: 500;
+    display: flex; align-items: center; gap: 5px;
+  }
+  .dot-live {
+    width: 7px; height: 7px; background: var(--accent);
+    border-radius: 50%; display: inline-block;
+  }
+  .btn-sm { padding: 8px 18px; font-size: 13px; border-radius: 8px; }
+
+  /* ────────── FEATURED COMING ────────── */
+  .featured-coming {
+    margin-top: 48px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+  .featured-coming-inner {
+    display: grid; grid-template-columns: 1fr 1fr;
+  }
+  .featured-coming-left {
+    padding: 48px;
+    background: var(--bg-dark);
+    color: white;
+    display: flex; flex-direction: column; justify-content: center;
+  }
+  .featured-coming-left .fc-tag {
+    display: inline-block;
+    background: rgba(255,255,255,.12);
+    color: rgba(255,255,255,.7);
+    border-radius: 20px; padding: 4px 12px;
+    font-size: 11px; font-weight: 600;
+    letter-spacing: 0.06em; margin-bottom: 20px;
+  }
+  .featured-coming-left h3 {
+    font-size: 28px; font-weight: 700;
+    font-family: var(--font-serif);
+    color: white; margin-bottom: 14px; line-height: 1.3;
+  }
+  .featured-coming-left p {
+    font-size: 14px; color: rgba(255,255,255,.6);
+    line-height: 1.8; margin-bottom: 24px;
+  }
+  .featured-coming-left .fc-features {
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .fc-feat {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; color: rgba(255,255,255,.7);
+  }
+  .fc-feat-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%; background: #7BAAC4; flex-shrink: 0;
+  }
+  .featured-coming-right {
+    padding: 48px;
+    display: flex; flex-direction: column; justify-content: center; gap: 20px;
+  }
+  .fc-quote {
+    font-family: var(--font-serif);
+    font-size: 17px; line-height: 1.8;
+    color: var(--text-soft); font-weight: 400;
+    border-left: 3px solid var(--accent-soft);
+    padding-left: 20px; font-style: italic;
+  }
+  .fc-bottom {
+    display: flex; align-items: center; justify-content: space-between;
+    padding-top: 20px; border-top: 1px solid var(--border);
+  }
+  .fc-badge {
+    display: inline-block;
+    background: var(--gold-soft); color: var(--gold);
+    border: 1px solid #DEC898; border-radius: 20px;
+    padding: 4px 12px; font-size: 11px; font-weight: 600;
+  }
+
+  /* ────────── COMING SOON ────────── */
+  .coming-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 20px;
+  }
+  .coming-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 28px 24px;
+    position: relative; overflow: hidden;
+    transition: transform .2s, box-shadow .2s;
+  }
+  .coming-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+  .coming-card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+  }
+  .coming-card.blue::before   { background: var(--accent); }
+  .coming-card.gold::before   { background: var(--gold); }
+  .coming-card.slate::before  { background: #5A6A7A; }
+  .coming-card.warm::before   { background: var(--warm); }
+  .coming-card.sage::before   { background: #6B8A6B; }
+
+  .coming-emoji { font-size: 32px; margin-bottom: 14px; }
+  .coming-name { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+  .coming-desc { font-size: 13px; color: var(--text-soft); line-height: 1.65; margin-bottom: 16px; }
+  .coming-badge {
+    display: inline-block; background: var(--surface-2);
+    border: 1px solid var(--border); border-radius: 20px;
+    padding: 3px 10px; font-size: 11px; color: var(--text-mute);
+  }
+
+  /* ────────── PHILOSOPHY ────────── */
+  .philosophy { background: var(--bg-dark); color: white; }
+  .philosophy-inner {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 72px; align-items: center; padding: 80px 0;
+  }
+  .philosophy-quote {
+    font-family: var(--font-serif);
+    font-size: clamp(19px, 2.8vw, 26px);
+    line-height: 1.65; color: rgba(255,255,255,.88); font-weight: 400;
+  }
+  .philosophy-quote em { font-style: normal; color: #90B4D0; }
+  .philosophy-quote .attr {
+    display: block; margin-top: 16px;
+    font-size: 13px; color: rgba(255,255,255,.35); font-family: var(--font);
+  }
+  .philosophy-pillars { display: grid; gap: 18px; }
+  .pillar { display: flex; gap: 16px; align-items: flex-start; }
+  .pillar-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; flex-shrink: 0; background: rgba(255,255,255,.08);
+  }
+  .pillar-text h4 {
+    font-size: 15px; font-weight: 600;
+    color: rgba(255,255,255,.88); margin-bottom: 4px;
+  }
+  .pillar-text p { font-size: 13px; color: rgba(255,255,255,.48); line-height: 1.65; }
+
+  /* ────────── NEWSLETTER ────────── */
+  .newsletter {
+    background: var(--accent-pale); border-radius: var(--radius-lg);
+    padding: 56px 48px; text-align: center;
+    border: 1px solid var(--accent-soft);
+  }
+  .newsletter h3 { font-size: 24px; font-weight: 700; margin-bottom: 10px; }
+  .newsletter p {
+    color: var(--text-soft); font-size: 14px; margin-bottom: 28px;
+    max-width: 440px; margin-left: auto; margin-right: auto;
+  }
+  .newsletter-form { display: flex; gap: 10px; max-width: 420px; margin: 0 auto; }
+  .newsletter-input {
+    flex: 1; border: 1px solid var(--border); border-radius: 8px;
+    padding: 11px 16px; font-size: 14px; font-family: inherit;
+    background: white; color: var(--text); outline: none; transition: border-color .2s;
+  }
+  .newsletter-input:focus { border-color: var(--accent); }
+
+  /* ────────── FOOTER ────────── */
+  .footer { background: var(--bg-dark); color: rgba(255,255,255,.48); padding: 48px 0 32px; }
+  .footer-inner {
+    display: grid; grid-template-columns: 2fr 1fr 1fr;
+    gap: 48px; margin-bottom: 40px;
+  }
+  .footer-brand h3 {
+    font-size: 18px; font-weight: 700;
+    color: white; margin-bottom: 10px; letter-spacing: 0.04em;
+  }
+  .footer-brand p { font-size: 13px; line-height: 1.75; max-width: 280px; }
+  .footer-col h4 {
+    font-size: 13px; font-weight: 600;
+    color: rgba(255,255,255,.75); margin-bottom: 14px; letter-spacing: 0.05em;
+  }
+  .footer-links { list-style: none; display: flex; flex-direction: column; gap: 9px; }
+  .footer-links a { font-size: 13px; color: rgba(255,255,255,.38); transition: color .2s; }
+  .footer-links a:hover { color: rgba(255,255,255,.75); }
+  .footer-bottom {
+    border-top: 1px solid rgba(255,255,255,.08);
+    padding-top: 24px; display: flex;
+    justify-content: space-between; align-items: center; font-size: 12px;
+  }
+  .footer-privacy { display: flex; gap: 20px; }
+  .footer-privacy a { color: rgba(255,255,255,.28); transition: color .2s; }
+  .footer-privacy a:hover { color: rgba(255,255,255,.55); }
+
+  /* ────────── RESPONSIVE ────────── */
+  @media (max-width: 900px) {
+    .tools-grid { grid-template-columns: 1fr; }
+    .coming-grid { grid-template-columns: 1fr 1fr; }
+    .philosophy-inner { grid-template-columns: 1fr; gap: 40px; }
+    .footer-inner { grid-template-columns: 1fr 1fr; }
+    .footer-inner .footer-brand { grid-column: 1 / -1; }
+    .featured-coming-inner { grid-template-columns: 1fr; }
+    .featured-coming-left { padding: 36px; }
+    .featured-coming-right { padding: 36px; }
+  }
+  @media (max-width: 600px) {
+    .nav-links { display: none; }
+    .hero { padding: 60px 0 56px; }
+    .hero-stats { gap: 24px; padding: 20px; }
+    .coming-grid { grid-template-columns: 1fr; }
+    .newsletter { padding: 36px 24px; }
+    .newsletter-form { flex-direction: column; }
+    .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ════════ NAV ════════ -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">
+        <div class="nav-logo-icon">🌿</div>
+        <span class="nav-logo-text">XLifeOS</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#tools">工具</a></li>
+        <li><a href="#coming">即将上线</a></li>
+        <li><a href="#about">我们的理念</a></li>
+        <li><a href="#newsletter" class="nav-cta">订阅更新</a></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-badge">🌿 面向知识女性的人生管理工具</div>
+    <h1>
+      身体、心智与人生，<br>
+      你<em>最重要的资产</em>
+    </h1>
+    <p class="hero-sub">
+      我们为认真对待人生的人，提供专业可信、温暖实用的健康与生命管理工具。<br>
+      从每日记录到人生规划，一切值得认真对待的事，都在这里。
+    </p>
+    <div class="hero-actions">
+      <a href="#tools" class="btn btn-primary">探索工具 →</a>
+      <a href="#about" class="btn btn-outline">了解我们的理念</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">100%</div>
+        <div class="stat-label">数据本地存储，完全私密</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">免费</div>
+        <div class="stat-label">核心工具永久免费</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">无广告</div>
+        <div class="stat-label">干净、专注的使用体验</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ TOOLS ════════ -->
+<section class="section" id="tools">
+  <div class="container">
+    <div class="section-tag">现在可用</div>
+    <div class="section-title">已上线工具</div>
+    <p class="section-desc">每一个工具都经过认真设计，帮你把真正重要的事情做好。</p>
+
+    <div class="tools-grid">
+
+      <!-- 栖·日记 -->
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <span class="tool-tag tag-blue">情绪与记录</span>
+          <span class="tool-icon">📔</span>
+          <div class="tool-name">栖 · 日记</div>
+          <p class="tool-desc">
+            一款安静的私人日记应用。支持文字、照片、心情标签与天气记录，自动保存，随时导出。
+            为需要一个真正属于自己的角落、整理内心的人而生。
+          </p>
+          <div class="tool-features">
+            <span class="feat-chip">📷 附照片</span>
+            <span class="feat-chip">🏷️ 标签分类</span>
+            <span class="feat-chip">🌤️ 天气记录</span>
+            <span class="feat-chip">📥 批量导出</span>
+            <span class="feat-chip">🔒 完全本地</span>
+          </div>
+        </div>
+        <div class="tool-card-bottom">
+          <div class="tool-status"><span class="dot-live"></span>已上线</div>
+          <a href="diary-v2-final.html" class="btn btn-primary btn-sm">立即使用 →</a>
+        </div>
+      </div>
+
+      <!-- 心愿书 -->
+      <div class="tool-card">
+        <div class="tool-card-top">
+          <span class="tool-tag tag-gold">人生规划</span>
+          <span class="tool-icon">💌</span>
+          <div class="tool-name">心愿书</div>
+          <p class="tool-desc">
+            引导你系统梳理财产、受益人与人生心愿的遗嘱规划向导。专业法律提示，温暖的引导语言，
+            帮你为家人留下最清晰的安排，与最真诚的心意。
+          </p>
+          <div class="tool-features">
+            <span class="feat-chip">📋 8步引导</span>
+            <span class="feat-chip">⚖️ 法律提示</span>
+            <span class="feat-chip">📄 生成草稿</span>
+            <span class="feat-chip">💕 家书功能</span>
+            <span class="feat-chip">🔒 完全本地</span>
+          </div>
+        </div>
+        <div class="tool-card-bottom">
+          <div class="tool-status"><span class="dot-live"></span>已上线</div>
+          <a href="心愿书-遗嘱规划向导.html" class="btn btn-primary btn-sm" style="background:var(--gold)">立即使用 →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ════════ COMING SOON ════════ -->
+<section class="section" id="coming" style="background:var(--surface-2)">
+  <div class="container">
+    <div class="section-tag">即将上线</div>
+    <div class="section-title">更多正在建设中</div>
+    <p class="section-desc">我们正在打造一个完整的生命管理体系，每一个模块都经过深思熟虑。</p>
+
+    <!-- 守 · 照护者陪伴 —— Featured -->
+    <div class="featured-coming">
+      <div class="featured-coming-inner">
+        <div class="featured-coming-left">
+          <span class="fc-tag">重点开发中</span>
+          <h3>守 · 照护者陪伴</h3>
+          <p>
+            为正在照顾阿尔茨海默症或其他认知症家人的人而设计。
+            这段时间漫长而沉默，我们相信它值得被认真对待——不只是撑过去，而是好好地活在其中。
+          </p>
+          <div class="fc-features">
+            <div class="fc-feat"><div class="fc-feat-dot"></div>每日仪式引导，把重复变成有框的时间</div>
+            <div class="fc-feat"><div class="fc-feat-dot"></div>生命档案，成为家人记忆的守护者</div>
+            <div class="fc-feat"><div class="fc-feat-dot"></div>见证社群，让你的付出被真正看见</div>
+            <div class="fc-feat"><div class="fc-feat-dot"></div>照护结束后的过渡陪伴，帮你好好走出</div>
+          </div>
+        </div>
+        <div class="featured-coming-right">
+          <p class="fc-quote">
+            "当一个人在不被认出的情况下仍然继续爱，<br>这是人类最纯粹的爱的形式之一。<br>
+            但照护者自己往往不知道这一点。"
+          </p>
+          <div class="fc-bottom">
+            <span class="fc-badge">⭑ 重点开发中</span>
+            <a href="#newsletter" class="btn btn-outline btn-sm">订阅，第一时间收到通知</a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 其余 coming soon -->
+    <div class="coming-grid">
+      <div class="coming-card blue">
+        <div class="coming-emoji">📊</div>
+        <div class="coming-name">健康数据追踪</div>
+        <p class="coming-desc">血压、血糖、体重、睡眠等关键指标记录与趋势图，让身体数据为你说话。</p>
+        <span class="coming-badge">研发中</span>
+      </div>
+
+      <div class="coming-card slate">
+        <div class="coming-emoji">🧮</div>
+        <div class="coming-name">健康计算器</div>
+        <p class="coming-desc">BMI、基础代谢、药物剂量……常用健康计算一站汇集，随查随用。</p>
+        <span class="coming-badge">规划中</span>
+      </div>
+
+      <div class="coming-card warm">
+        <div class="coming-emoji">🧘</div>
+        <div class="coming-name">情绪与心理</div>
+        <p class="coming-desc">情绪日志、冥想引导、压力自评……关注你看不见的那部分健康。</p>
+        <span class="coming-badge">规划中</span>
+      </div>
+
+      <div class="coming-card gold">
+        <div class="coming-emoji">📚</div>
+        <div class="coming-name">健康知识库</div>
+        <p class="coming-desc">睡眠科学、营养指南、慢病管理……专业内容，读得懂，用得上。</p>
+        <span class="coming-badge">规划中</span>
+      </div>
+
+      <div class="coming-card sage">
+        <div class="coming-emoji">🤝</div>
+        <div class="coming-name">同行者社群</div>
+        <p class="coming-desc">与有深度的同龄人相遇，分享经验与见解。不说教，只共鸣。</p>
+        <span class="coming-badge">规划中</span>
+      </div>
+
+      <div class="coming-card blue">
+        <div class="coming-emoji">🌙</div>
+        <div class="coming-name">每周健康简报</div>
+        <p class="coming-desc">精选与你相关的健康资讯，不被信息洪流淹没，只接收值得读的。</p>
+        <span class="coming-badge">规划中</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ PHILOSOPHY ════════ -->
+<section class="philosophy" id="about">
+  <div class="container">
+    <div class="philosophy-inner">
+      <div>
+        <blockquote class="philosophy-quote">
+          "健康不只是没有疾病，<br>
+          而是<em>身体、心智与社会关系</em><br>
+          都处于完好的状态。"
+          <span class="attr">— 世界卫生组织</span>
+        </blockquote>
+        <p style="margin-top:32px;font-size:14px;color:rgba(255,255,255,.48);line-height:1.8">
+          我们相信，认真对待人生的人，对健康的需求远不止体检报告和养生食谱。<br>
+          需要的是：清晰的工具、可信的知识，以及被认真对待的感觉。<br>
+          XLifeOS 不只管理数据，更陪你经历那些值得被看见的时刻。
+        </p>
+      </div>
+      <div class="philosophy-pillars">
+        <div class="pillar">
+          <div class="pillar-icon">🌿</div>
+          <div class="pillar-text">
+            <h4>身体健康</h4>
+            <p>数据记录、体征追踪、健康计算，让身体状况一目了然，而非被动等待出问题。</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🧠</div>
+          <div class="pillar-text">
+            <h4>心智清明</h4>
+            <p>情绪记录、意义建构、持续学习，永远保持清醒，不让岁月消磨好奇与判断力。</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">📋</div>
+          <div class="pillar-text">
+            <h4>人生有序</h4>
+            <p>遗嘱规划、照护陪伴、人生心愿——提前安排，为自己和家人都留一份安心。</p>
+          </div>
+        </div>
+        <div class="pillar">
+          <div class="pillar-icon">🤲</div>
+          <div class="pillar-text">
+            <h4>被人看见</h4>
+            <p>生命中那些沉默的付出与沉默的时刻，值得被记录、被见证、被认真对待。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ NEWSLETTER ════════ -->
+<section class="section-sm" id="newsletter">
+  <div class="container">
+    <div class="newsletter">
+      <h3>🌿 订阅 XLifeOS 更新</h3>
+      <p>新工具上线、重要更新与值得一读的内容，第一时间送达。不发广告，随时可退订。</p>
+      <form class="newsletter-form" onsubmit="handleSubscribe(event)">
+        <input class="newsletter-input" type="email" placeholder="你的邮箱地址" required>
+        <button type="submit" class="btn btn-primary">订阅</button>
+      </form>
+      <p id="subscribe-msg" style="margin-top:14px;font-size:13px;color:var(--accent);display:none">
+        ✓ 已收到！我们会尽快与你联系。
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FOOTER ════════ -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>🌿 XLifeOS</h3>
+        <p>为认真对待人生的人，提供身心与生命的管理工具。所有工具完全私密，数据只存在你的设备上。</p>
+      </div>
+      <div class="footer-col">
+        <h4>工具</h4>
+        <ul class="footer-links">
+          <li><a href="diary-v2-final.html">栖 · 日记</a></li>
+          <li><a href="心愿书-遗嘱规划向导.html">心愿书</a></li>
+          <li><a href="#coming">守 · 照护者陪伴（即将上线）</a></li>
+          <li><a href="#coming">更多工具</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>关于</h4>
+        <ul class="footer-links">
+          <li><a href="#about">我们的理念</a></li>
+          <li><a href="#newsletter">订阅更新</a></li>
+          <li><a href="mailto:hello@xlifeos.com">联系我们</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 🌿 XLifeOS · 为认真活着的人而建</span>
+      <div class="footer-privacy">
+        <a href="#">隐私政策</a>
+        <a href="#">使用条款</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function handleSubscribe(e) {
+  e.preventDefault();
+  document.getElementById('subscribe-msg').style.display = 'block';
+  e.target.querySelector('input').value = '';
+}
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const target = document.querySelector(a.getAttribute('href'));
+    if (target) {
+      e.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  });
+});
+</script>
+</body>
+</html>
